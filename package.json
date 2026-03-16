@@ -1,6 +1,9 @@
 {
   "private": true,
-  "workspaces": ["packages/*", "apps/*"],
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
   "scripts": {
     "dev": "yarn build:lib && yarn workspace @puresignal/fetch-stream-audio-demo dev",
     "build": "yarn build:lib && yarn build:demo",
