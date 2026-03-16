@@ -1,5 +1,5 @@
 {
-  "name": "fetch-stream-audio",
+  "name": "@puresignal/fetch-stream-audio",
   "version": "1.0.0",
   "description": "Low-latency streaming audio playback using Fetch, Streams, and Web Audio APIs",
   "type": "module",

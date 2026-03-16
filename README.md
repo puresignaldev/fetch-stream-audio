@@ -100,11 +100,67 @@ https://fetch-stream-audio.anthum.com/512kbps/opus/decode-test-64kbit.opus
 
 </details>
 
+# Fork Notice
+
+This is a fork of [AnthumChris/fetch-stream-audio](https://github.com/anthumchris/fetch-stream-audio). The original project is a proof-of-concept demo. This fork packages the core audio streaming logic as a publishable npm module so it can be used as a library in other projects.
+
+> [!WARNING]
+> This npm package was generated with the help of [Claude Code](https://claude.ai/code) and has not been tested beyond surface-level verification that the demo works. It is **not production-ready**. Use at your own risk and expect rough edges.
+
+# npm Package
+
+This fork is published as `@puresignal/fetch-stream-audio` on npm. Install it in any project with a bundler (webpack 5, Vite, esbuild, Rollup):
+
+```bash
+npm install @puresignal/fetch-stream-audio
+```
+
+## Usage
+
+```js
+import { FetchStreamAudio } from '@puresignal/fetch-stream-audio';
+
+const player = new FetchStreamAudio(
+  'https://example.com/audio.opus',
+  1024 * 2,  // read buffer size in bytes
+  'OPUS'     // or 'PCM' for WAV
+);
+
+player.onUpdateState = ({ playState, latency, bytesRead, skips }) => {
+  console.log(playState, latency, skips);
+};
+
+player.start();
+// player.pause() / player.resume() / player.close()
+```
+
+The consumer's bundler sees the `new URL('./worker.js', import.meta.url)` pattern inside the package and automatically copies the worker files into the build output with correct URLs — this is the W3C-standard approach supported by webpack 5, Vite, esbuild, and Rollup.
+
+### Script-tag / CDN (no bundler)
+
+If you are not using a bundler, you must manually host the worker and WASM files and pass worker URLs explicitly:
+
+```js
+const player = new FetchStreamAudio(url, 5120, 'OPUS', {
+  opusWorkerUrl: '/assets/worker-decoder-opus.js'
+});
+```
+
+## Published Files
+
+The npm package includes:
+
+| File | Description |
+| ---- | ----------- |
+| `dist/fetch-stream-audio.mjs` | ESM library entry |
+| `dist/fetch-stream-audio.cjs` | CJS library entry |
+| `dist/worker-decoder-opus.js` | Bundled Opus decoder worker |
+| `dist/worker-decoder-wav.js` | Bundled WAV decoder worker |
+| `dist/opus-stream-decoder.wasm` | Opus WebAssembly binary |
+
 # Development & Building
 
-Please remember that this is a proof-of-concept demo intended to show developers alternative (and possibly better) ways to play web audio.  Currently, there's no formal package or release (see [#21](https://github.com/AnthumChris/fetch-stream-audio/issues/21)), so you'll need to improvise a little to get this working in your apps or websites.
-
-I prefer [Yarn](https://yarnpkg.com/getting-started), and you'll need Yarn or [NodeJS](https://nodejs.org/en/) installed to build the project. [`app.js`](https://github.com/AnthumChris/fetch-stream-audio/blob/master/src/js/app.js) is the entry point for starting with the code.
+You'll need [Yarn](https://yarnpkg.com/getting-started) or [NodeJS](https://nodejs.org/en/) installed. [`app.js`](https://github.com/AnthumChris/fetch-stream-audio/blob/master/src/js/app.js) is the entry point for the demo app.
 
 ```bash
 # clone repo and install dependencies
@@ -114,13 +170,17 @@ $ yarn install
 ```
 
 ```bash
-# run the development server in "watch" mode to automatically re-build your changes
+# run the development server with HMR
 $ yarn dev
 ```
 
 ```bash
-# build the project formally with minification
+# build everything (library + demo)
 $ yarn build
+
+# or build separately
+$ yarn build:lib   # library + workers → dist/
+$ yarn build:demo  # demo app → dist/demo/
 ```
 
 
