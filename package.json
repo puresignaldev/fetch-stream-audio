@@ -5,11 +5,11 @@
   "type": "module",
   "main": "./dist/fetch-stream-audio.cjs",
   "module": "./dist/fetch-stream-audio.mjs",
-  "types": "./src/lib/index.d.ts",
+  "types": "./dist/index.d.ts",
   "repository": "https://github.com/puresignaldev/fetch-stream-audio",
   "exports": {
     ".": {
-      "types": "./src/lib/index.d.ts",
+      "types": "./dist/index.d.ts",
       "import": "./dist/fetch-stream-audio.mjs",
       "require": "./dist/fetch-stream-audio.cjs"
     },
@@ -18,8 +18,7 @@
   },
   "files": [
     "dist/",
-    "!dist/demo",
-    "src/lib/index.d.ts"
+    "!dist/demo"
   ],
   "scripts": {
     "dev": "vite --config vite.demo.config.js",
