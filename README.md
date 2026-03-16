@@ -15,9 +15,101 @@ The examples demonstrate:
 1. **Opus Streaming** [`opus-stream-decoder`](https://github.com/AnthumChris/opus-stream-decoder) is used to decode an [Opus](http://opus-codec.org/) file in a Web Worker with WebAssembly.  This simulates a real-world use case of streaming compressed audio over the web with the Web Audio  API.  (MP3 is old and outdated for those of us who grew up with WinPlay3.  Opus is the new gold standard).  This example is ideal because it allows for small, high-quality files with Opus.
 1. **WAV Streaming**  A WAV file is streamed and decoded by a Web Worker.  Chunks are scheduled into a read buffer before sending to encoder to ensure decoder receives complete, decodable chunks.  JavaScript (not WebAssembly) is used for decoding. This example requires a much larger file.
 
+# npm Package
+
+This fork is published as `@puresignal/fetch-stream-audio` on npm.
+
+```bash
+npm install @puresignal/fetch-stream-audio
+```
+
+## Usage
+
+```js
+import { FetchStreamAudio } from '@puresignal/fetch-stream-audio';
+import opusWorkerUrl from '@puresignal/fetch-stream-audio/worker-decoder-opus?url';
+
+const player = new FetchStreamAudio(
+  'https://example.com/audio.opus',
+  1024 * 2,  // read buffer size in bytes
+  'OPUS',    // or 'PCM' for WAV
+  { opusWorkerUrl }
+);
+
+player.onUpdateState = (state) => {
+  console.log(state);
+};
+
+player.start();
+// player.pause() / player.resume() / player.close()
+```
+
+The `?url` import suffix is supported by Vite, webpack 5, and other modern bundlers. It gives you a resolved URL to the worker file without executing it.
+
+The Opus worker has its WebAssembly binary inlined, so **no extra files need to be copied or served** — just the `?url` import and you're done.
+
+### WAV streaming
+
+```js
+import { FetchStreamAudio } from '@puresignal/fetch-stream-audio';
+import wavWorkerUrl from '@puresignal/fetch-stream-audio/worker-decoder-wav?url';
+
+const player = new FetchStreamAudio(
+  'https://example.com/audio.wav',
+  1024 * 16,  // WAV needs a larger buffer to prevent skipping
+  'PCM',
+  { wavWorkerUrl }
+);
+```
+
+### Script-tag / CDN (no bundler)
+
+If you are not using a bundler, host the worker files and pass URLs explicitly:
+
+```js
+const player = new FetchStreamAudio(url, 1024 * 2, 'OPUS', {
+  opusWorkerUrl: '/assets/worker-decoder-opus.js'
+});
+```
+
+### State updates
+
+Each `onUpdateState` callback receives a **partial** state object — only the properties that changed. Accumulate them to get the full picture:
+
+```js
+const state = {};
+
+player.onUpdateState = (partial) => {
+  Object.assign(state, partial);
+  // state.playState, state.bytesRead, state.abCreated, state.latency, etc.
+};
+```
+
+| Property | Type | Description |
+| -------- | ---- | ----------- |
+| `playState` | `'playing' \| 'paused'` | Current playback state |
+| `bytesRead` | `number` | Bytes downloaded so far |
+| `bytesTotal` | `number` | Total file size in bytes |
+| `dlRate` | `number` | Download rate in kbps |
+| `latency` | `number` | Initial latency in ms |
+| `abCreated` | `number` | AudioBuffers created |
+| `abEnded` | `number` | AudioBuffers finished playing |
+| `abRemaining` | `number` | AudioBuffers queued for playback |
+| `skips` | `number` | Audio skips (caused by slow download) |
+| `error` | `string` | Error message if something failed |
+
+## Published files
+
+| File | Description |
+| ---- | ----------- |
+| `dist/fetch-stream-audio.mjs` | ESM library entry |
+| `dist/fetch-stream-audio.cjs` | CJS library entry |
+| `dist/worker-decoder-opus.js` | Bundled Opus decoder worker (WASM inlined) |
+| `dist/worker-decoder-wav.js` | Bundled WAV decoder worker |
+
 # Opus Playback Tests
 
-Opus file playback can be tested at throttled download speeds and varkous encoding/bitrate qualities ([Issue #14](https://github.com/AnthumChris/fetch-stream-audio/issues/14) will add to UI):
+Opus file playback can be tested at throttled download speeds and various encoding/bitrate qualities:
 
 [opusBitrate = 96; throttle = nolimit](https://fetch-stream-audio.anthum.com/#opusBitrate=96;throttle=nolimit)<br>
 [opusBitrate = 96; throttle = 1mbps](https://fetch-stream-audio.anthum.com/#opusBitrate=96;throttle=1mbps)<br>
@@ -49,141 +141,45 @@ server {
 }
 ```
 
-## Throttled Bandwidth Endpoints
-
-All `/audio/*` URIs are configured to intentionally limit download speeds and control response packet sizes for testing the decoding behavior (defined in [include-server.conf](.conf/nginx/include-server.conf)).  For example:
-
-https://fetch-stream-audio.anthum.com/nolimit/opus/decode-test-64kbit.opus<br>
-https://fetch-stream-audio.anthum.com/10mbps/opus/decode-test-64kbit.opus<br>
-https://fetch-stream-audio.anthum.com/1.5mbps/opus/decode-test-64kbit.opus<br>
-https://fetch-stream-audio.anthum.com/512kbps/opus/decode-test-64kbit.opus
-
 <details>
-<summary>All Throttled Endpoints</summary>
+<summary>Throttled Bandwidth Endpoints</summary>
+
+All `/audio/*` URIs are configured to intentionally limit download speeds and control response packet sizes for testing the decoding behavior (defined in [include-server.conf](.conf/nginx/include-server.conf)).
 
 | Speed      | Example URL |
 | ----------- | ----------- |
 | 16 kbps | https://fetch-stream-audio.anthum.com/16kbps/opus/decode-test-64kbit.opus |
 | 24 kbps | https://fetch-stream-audio.anthum.com/24kbps/opus/decode-test-64kbit.opus |
 | 32 kbps | https://fetch-stream-audio.anthum.com/32kbps/opus/decode-test-64kbit.opus |
-| 40 kbps | https://fetch-stream-audio.anthum.com/32kbps/opus/decode-test-40kbit.opus |
-| 56 kbps | https://fetch-stream-audio.anthum.com/32kbps/opus/decode-test-56kbit.opus |
 | 64 kbps | https://fetch-stream-audio.anthum.com/64kbps/opus/decode-test-64kbit.opus |
-| 72 kbps | https://fetch-stream-audio.anthum.com/72kbps/opus/decode-test-64kbit.opus |
-| 80 kbps | https://fetch-stream-audio.anthum.com/80kbps/opus/decode-test-64kbit.opus |
-| 88 kbps | https://fetch-stream-audio.anthum.com/88kbps/opus/decode-test-64kbit.opus |
-| 96 kbps | https://fetch-stream-audio.anthum.com/96kbps/opus/decode-test-64kbit.opus |
-| 100 kbps | https://fetch-stream-audio.anthum.com/100kbps/opus/decode-test-64kbit.opus |
-| 104 kbps | https://fetch-stream-audio.anthum.com/104kbps/opus/decode-test-64kbit.opus |
-| 112 kbps | https://fetch-stream-audio.anthum.com/112kbps/opus/decode-test-64kbit.opus |
-| 120 kbps | https://fetch-stream-audio.anthum.com/120kbps/opus/decode-test-64kbit.opus |
 | 128 kbps | https://fetch-stream-audio.anthum.com/128kbps/opus/decode-test-64kbit.opus |
-| 160 kbps | https://fetch-stream-audio.anthum.com/160kbps/opus/decode-test-64kbit.opus |
-| 192 kbps | https://fetch-stream-audio.anthum.com/192kbps/opus/decode-test-64kbit.opus |
 | 256 kbps | https://fetch-stream-audio.anthum.com/256kbps/opus/decode-test-64kbit.opus |
-| 384 kbps | https://fetch-stream-audio.anthum.com/384kbps/opus/decode-test-64kbit.opus |
 | 512 kbps | https://fetch-stream-audio.anthum.com/512kbps/opus/decode-test-64kbit.opus |
-| 768 kbps | https://fetch-stream-audio.anthum.com/768kbps/opus/decode-test-64kbit.opus |
 | 1 mbps | https://fetch-stream-audio.anthum.com/1mbps/opus/decode-test-64kbit.opus |
-| 4 mbps | https://fetch-stream-audio.anthum.com/4mbps/opus/decode-test-64kbit.opus |
 | 5 mbps | https://fetch-stream-audio.anthum.com/5mbps/opus/decode-test-64kbit.opus |
-| 2 mbps | https://fetch-stream-audio.anthum.com/2mbps/opus/decode-test-64kbit.opus |
-| 3 mbps | https://fetch-stream-audio.anthum.com/3mbps/opus/decode-test-64kbit.opus |
-| 4 mbps | https://fetch-stream-audio.anthum.com/4mbps/opus/decode-test-64kbit.opus |
-| 5 mbps | https://fetch-stream-audio.anthum.com/5mbps/opus/decode-test-64kbit.opus |
-| 6 mbps | https://fetch-stream-audio.anthum.com/6mbps/opus/decode-test-64kbit.opus |
-| 7 mbps | https://fetch-stream-audio.anthum.com/7mbps/opus/decode-test-64kbit.opus |
-| 8 mbps | https://fetch-stream-audio.anthum.com/8mbps/opus/decode-test-64kbit.opus |
-| 9 mbps | https://fetch-stream-audio.anthum.com/9mbps/opus/decode-test-64kbit.opus |
 | 10 mbps | https://fetch-stream-audio.anthum.com/10mbps/opus/decode-test-64kbit.opus |
-| nolimit | https://fetch-stream-audio.anthum.com/nolimit/opus/decode-test-64kbit.opus<br>https://fetch-stream-audio.anthum.com/audio/opus/decode-test-64kbit.opus |
+| nolimit | https://fetch-stream-audio.anthum.com/nolimit/opus/decode-test-64kbit.opus |
 
 </details>
 
+# Development
+
+```bash
+git clone https://github.com/puresignaldev/fetch-stream-audio
+cd fetch-stream-audio
+yarn install
+```
+
+```bash
+yarn dev          # dev server with HMR
+yarn build        # full build: library + workers + demo
+yarn build:lib    # library build only
+yarn build:demo   # demo app build only
+```
+
 # Fork Notice
 
-This is a fork of [AnthumChris/fetch-stream-audio](https://github.com/anthumchris/fetch-stream-audio). The original project is a proof-of-concept demo. This fork packages the core audio streaming logic as a publishable npm module so it can be used as a library in other projects.
-
-> [!WARNING]
-> This npm package was generated with the help of [Claude Code](https://claude.ai/code) and has not been tested beyond surface-level verification that the demo works. It is **not production-ready**. Use at your own risk and expect rough edges.
-
-# npm Package
-
-This fork is published as `@puresignal/fetch-stream-audio` on npm. Install it in any project with a bundler (webpack 5, Vite, esbuild, Rollup):
-
-```bash
-npm install @puresignal/fetch-stream-audio
-```
-
-## Usage
-
-```js
-import { FetchStreamAudio } from '@puresignal/fetch-stream-audio';
-
-const player = new FetchStreamAudio(
-  'https://example.com/audio.opus',
-  1024 * 2,  // read buffer size in bytes
-  'OPUS'     // or 'PCM' for WAV
-);
-
-player.onUpdateState = ({ playState, latency, bytesRead, skips }) => {
-  console.log(playState, latency, skips);
-};
-
-player.start();
-// player.pause() / player.resume() / player.close()
-```
-
-The consumer's bundler sees the `new URL('./worker.js', import.meta.url)` pattern inside the package and automatically copies the worker files into the build output with correct URLs — this is the W3C-standard approach supported by webpack 5, Vite, esbuild, and Rollup.
-
-### Script-tag / CDN (no bundler)
-
-If you are not using a bundler, you must manually host the worker and WASM files and pass worker URLs explicitly:
-
-```js
-const player = new FetchStreamAudio(url, 5120, 'OPUS', {
-  opusWorkerUrl: '/assets/worker-decoder-opus.js'
-});
-```
-
-## Published Files
-
-The npm package includes:
-
-| File | Description |
-| ---- | ----------- |
-| `dist/fetch-stream-audio.mjs` | ESM library entry |
-| `dist/fetch-stream-audio.cjs` | CJS library entry |
-| `dist/worker-decoder-opus.js` | Bundled Opus decoder worker |
-| `dist/worker-decoder-wav.js` | Bundled WAV decoder worker |
-| `dist/opus-stream-decoder.wasm` | Opus WebAssembly binary |
-
-# Development & Building
-
-You'll need [Yarn](https://yarnpkg.com/getting-started) or [NodeJS](https://nodejs.org/en/) installed. [`app.js`](https://github.com/AnthumChris/fetch-stream-audio/blob/master/src/js/app.js) is the entry point for the demo app.
-
-```bash
-# clone repo and install dependencies
-$ git clone https://github.com/AnthumChris/fetch-stream-audio
-$ cd fetch-stream-audio
-$ yarn install
-```
-
-```bash
-# run the development server with HMR
-$ yarn dev
-```
-
-```bash
-# build everything (library + demo)
-$ yarn build
-
-# or build separately
-$ yarn build:lib   # library + workers → dist/
-$ yarn build:demo  # demo app → dist/demo/
-```
-
-
+This is a fork of [AnthumChris/fetch-stream-audio](https://github.com/anthumchris/fetch-stream-audio). The original project is a proof-of-concept demo. This fork packages the core audio streaming logic as a publishable npm module.
 
 # Acknowledgements
 
