@@ -6,6 +6,7 @@ import { Player } from '../lit-components/player.mjs';
 export class AudioPlayer {
   _ui;
   _audio;
+  _audioCtx;
   _readSize;
   _mime;
   _codec;
@@ -15,7 +16,9 @@ export class AudioPlayer {
     this._readSize = readBufferSize;
     this._ui = new Player(wrapper);
     this._ui.onAction = this._onAction.bind(this);
-    this._audio = new AudioStreamPlayer(url, readBufferSize, codec.toUpperCase(), { wavWorkerUrl, opusWorkerUrl });
+    this._audioCtx = new AudioContext({ latencyHint: 'interactive' });
+    this._audio = new AudioStreamPlayer(this._audioCtx, url, readBufferSize, codec.toUpperCase(), { wavWorkerUrl, opusWorkerUrl });
+    this._audio.connect(this._audioCtx.destination);
     this._audio.onUpdateState = this._onUpdateState.bind(this);
 
     this._mime = mime;
@@ -37,8 +40,10 @@ export class AudioPlayer {
   }
 
   start() {
+    void this._audioCtx.resume();
     this._audio.start();
     this._ui.setState({
+      playState: 'playing',
       readBuffer: this._readSize,
       decoder: this._decoder
     });
@@ -46,11 +51,13 @@ export class AudioPlayer {
     this._onStateChange('playing');
   }
   pause() {
-    this._audio.pause();
+    void this._audioCtx.suspend();
+    this._ui.setState({ playState: 'paused' });
     this._onStateChange('paused');
   }
   resume() {
-    this._audio.resume();
+    void this._audioCtx.resume();
+    this._ui.setState({ playState: 'playing' });
     this._onStateChange('playing');
   }
 

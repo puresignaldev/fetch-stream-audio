@@ -6,7 +6,7 @@ export interface AudioStreamPlayerOptions {
 }
 
 export interface AudioStreamPlayerState {
-  playState?: "playing" | "paused";
+  playState?: "playing";
   error?: string;
   abCreated?: number;
   abEnded?: number;
@@ -29,26 +29,34 @@ export class AudioStreamPlayer {
   onUpdateState?: (state: AudioStreamPlayerState) => void;
 
   /**
+   * @param audioContext - External AudioContext to use for playback
    * @param url - URL of the audio file to stream
    * @param readBufferSize - Read buffer size in bytes
    * @param decoderName - Codec to use
    * @param options - Optional configuration
    */
   constructor(
+    audioContext: AudioContext,
     url: string,
     readBufferSize: number,
     decoderName: DecoderName,
     options?: AudioStreamPlayerOptions
   );
 
+  /** Connect the player's output to an AudioNode */
+  connect(destination: AudioNode, outputIndex?: number, inputIndex?: number): AudioNode;
+  /** Connect the player's output to an AudioParam */
+  connect(destination: AudioParam, outputIndex?: number): void;
+
+  /** Disconnect all outputs */
+  disconnect(): void;
+  /** Disconnect from a specific AudioNode */
+  disconnect(destination: AudioNode, output?: number, input?: number): void;
+  /** Disconnect from a specific AudioParam */
+  disconnect(destination: AudioParam, output?: number): void;
+
   /** Start streaming and playback */
   start(): void;
-
-  /** Pause playback */
-  pause(): void;
-
-  /** Resume playback */
-  resume(): void;
 
   /** Stop playback and release all resources */
   close(): void;

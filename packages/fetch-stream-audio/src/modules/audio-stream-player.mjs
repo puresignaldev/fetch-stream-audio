@@ -3,12 +3,13 @@ import { BufferedStreamReader } from './buffered-stream-reader.mjs';
 export class AudioStreamPlayer {
   // these shouldn't change once set
   _worker;
+  _audioCtx;
+  _outputNode;
   _url;
   _readBufferSize
 
   // these are reset
   _sessionId             // used to prevent race conditions between cancel/starts
-  _audioCtx;             // Created/Closed when this player starts/stops audio
   _reader;
   _audioSrcNodes         // Used to fix Safari Bug https://github.com/AnthumChris/fetch-stream-audio/issues/1
   _totalTimeScheduled    // time scheduled of all AudioBuffers
@@ -17,7 +18,7 @@ export class AudioStreamPlayer {
   _abEnded;              // AudioBuffers played/ended
   _skips;                // audio skipping caused by slow download
 
-  constructor(url, readBufferSize, decoderName, options = {}) {
+  constructor(audioContext, url, readBufferSize, decoderName, options = {}) {
     const { wavWorkerUrl, opusWorkerUrl } = options;
     switch (decoderName) {
       case 'PCM':
@@ -34,12 +35,19 @@ export class AudioStreamPlayer {
     };
     this._worker.onmessage = this._onWorkerMessage.bind(this);
 
-    // pause for now
-    // this._audioCtx.suspend().then(_ => console.log('audio paused'));
-
+    this._audioCtx = audioContext;
+    this._outputNode = new GainNode(this._audioCtx);
     this._url = url;
     this._readBufferSize = readBufferSize;
     this._reset();
+  }
+
+  connect(...args) {
+    return this._outputNode.connect(...args);
+  }
+
+  disconnect(...args) {
+    this._outputNode.disconnect(...args);
   }
 
   _reset() {
@@ -48,7 +56,6 @@ export class AudioStreamPlayer {
     }
 
     this._sessionId = null;
-    this._audioCtx = null;
     this._reader = null;
     this._audioSrcNodes = [];
     this._totalTimeScheduled = 0;
@@ -61,15 +68,11 @@ export class AudioStreamPlayer {
   close() {
     for (let node of this._audioSrcNodes) {
       node.onended = null;
-      node.disconnect(this._audioCtx.destination);
+      node.disconnect(this._outputNode);
       node.stop();
     }
     if (this._reader) {
       this._reader.abort();
-    }
-    if (this._audioCtx) {
-      this._audioCtx.suspend();
-      this._audioCtx.close();
     }
 
     this._reset();
@@ -78,7 +81,6 @@ export class AudioStreamPlayer {
   start() {
     this._sessionId = performance.now();
     performance.mark(this._downloadMarkKey);
-    this._audioCtx = new (window.AudioContext || window.webkitAudioContext)({ latencyHint: 'interactive' });
     const reader = new BufferedStreamReader(new Request(this._url), this._readBufferSize);
     reader.onRead = this._downloadProgress.bind(this);
     reader.onBufferFull = this._decode.bind(this);
@@ -89,14 +91,6 @@ export class AudioStreamPlayer {
     });
 
     this._reader = reader;
-    this.resume();
-  }
-
-  pause() {
-    this._audioCtx.suspend().then(_ => this._updateState({ playState: 'paused'}));
-  }
-  resume() {
-    this._audioCtx.resume().then(_ => this._updateState({ playState: 'playing'}));
   }
 
   _updateState(props) {
@@ -147,14 +141,15 @@ export class AudioStreamPlayer {
   }
 
   _schedulePlayback({channelData, length, numberOfChannels, sampleRate}) {
-    const audioSrc = this._audioCtx.createBufferSource(),
-          audioBuffer = this._audioCtx.createBuffer(numberOfChannels, length, sampleRate);
+    const audioBuffer = new AudioBuffer({numberOfChannels, length, sampleRate});
+    const audioSrc = new AudioBufferSourceNode(this._audioCtx, {buffer: audioBuffer});
 
     audioSrc.onended = () => {
       this._audioSrcNodes.shift();
       this._abEnded++;
       this._updateState();
     };
+
     this._abCreated++;
     this._updateState();
 
@@ -190,11 +185,10 @@ export class AudioStreamPlayer {
       // const startDelay = audioCtx.outputLatency || audioCtx.baseLatency || (128 / audioCtx.sampleRate);
 
       this._playStartedAt = this._audioCtx.currentTime + startDelay;
-      this._updateState({ latency: performance.now() - this._getDownloadStartTime() + startDelay*1000 });
+      this._updateState({latency: performance.now() - this._getDownloadStartTime() + startDelay * 1000});
     }
 
-    audioSrc.buffer = audioBuffer;
-    audioSrc.connect(this._audioCtx.destination);
+    audioSrc.connect(this._outputNode);
     
     const startAt = this._playStartedAt + this._totalTimeScheduled;
     if (this._audioCtx.currentTime >= startAt) {
