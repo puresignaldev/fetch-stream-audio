@@ -1,6 +1,8 @@
-import { OpusStreamDecoder } from 'opus-stream-decoder';
+import OpusStreamDecoderFactory from 'opus-stream-decoder/dist/opus-stream-decoder.mjs';
 import { DecodedAudioPlaybackBuffer } from './modules/decoded-audio-playback-buffer.mjs';
 
+const Module = OpusStreamDecoderFactory();
+const { OpusStreamDecoder } = Module;
 const decoder = new OpusStreamDecoder({ onDecode });
 const playbackBuffer = new DecodedAudioPlaybackBuffer({ onFlush });
 let sessionId, flushTimeoutId;
