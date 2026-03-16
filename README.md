@@ -6,10 +6,10 @@ Fork of [AnthumChris/fetch-stream-audio](https://github.com/anthumchris/fetch-st
 
 ## Packages
 
-| Package | Description |
-| ------- | ----------- |
-| [`packages/fetch-stream-audio`](packages/fetch-stream-audio/) | Published npm library (`@puresignal/fetch-stream-audio`) |
-| [`apps/demo`](apps/demo/) | Browser demo with throttled bandwidth testing |
+| Package                                                             | Description                                              |
+|---------------------------------------------------------------------|----------------------------------------------------------|
+| [`packages/fetch-stream-audio`](packages/fetch-stream-audio#readme) | Published npm library (`@puresignal/fetch-stream-audio`) |
+| [`apps/demo`](apps/demo#readme)                                     | Browser demo with throttled bandwidth testing            |
 
 ## Development
 
