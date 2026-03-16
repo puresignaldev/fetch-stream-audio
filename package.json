@@ -12,7 +12,9 @@
       "types": "./src/lib/index.d.ts",
       "import": "./dist/fetch-stream-audio.mjs",
       "require": "./dist/fetch-stream-audio.cjs"
-    }
+    },
+    "./worker-decoder-opus": "./dist/worker-decoder-opus.js",
+    "./worker-decoder-wav": "./dist/worker-decoder-wav.js"
   },
   "files": [
     "dist/",
