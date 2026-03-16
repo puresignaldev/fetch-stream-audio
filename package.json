@@ -6,6 +6,7 @@
   "main": "./dist/fetch-stream-audio.cjs",
   "module": "./dist/fetch-stream-audio.mjs",
   "types": "./src/lib/index.d.ts",
+  "repository": "https://github.com/puresignaldev/fetch-stream-audio",
   "exports": {
     ".": {
       "types": "./src/lib/index.d.ts",
