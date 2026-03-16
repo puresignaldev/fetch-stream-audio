@@ -17,11 +17,16 @@ export class AudioStreamPlayer {
   _abEnded;              // AudioBuffers played/ended
   _skips;                // audio skipping caused by slow download
 
-  constructor(url, readBufferSize, decoderName) {
+  constructor(url, readBufferSize, decoderName, options = {}) {
+    const { wavWorkerUrl, opusWorkerUrl } = options;
     switch (decoderName) {
-      case 'PCM': this._worker =  new Worker('../worker-decoder-wav.js'); break;
-      case 'OPUS': this._worker = new Worker('../worker-decoder-opus.js'); break;
-      default: throw Error('Unsupported decoderName', decoderName);
+      case 'PCM':
+        this._worker = new Worker(wavWorkerUrl || new URL('../worker-decoder-wav.js', import.meta.url));
+        break;
+      case 'OPUS':
+        this._worker = new Worker(opusWorkerUrl || new URL('../worker-decoder-opus.js', import.meta.url));
+        break;
+      default: throw Error('Unsupported decoderName: ' + decoderName);
     }
 
     this._worker.onerror = event => {

@@ -1,24 +1,36 @@
 {
   "name": "fetch-stream-audio",
-  "private": true,
+  "version": "1.0.0",
+  "description": "Low-latency streaming audio playback using Fetch, Streams, and Web Audio APIs",
+  "type": "module",
+  "main": "./dist/fetch-stream-audio.cjs",
+  "module": "./dist/fetch-stream-audio.mjs",
+  "exports": {
+    ".": {
+      "import": "./dist/fetch-stream-audio.mjs",
+      "require": "./dist/fetch-stream-audio.cjs"
+    }
+  },
+  "files": [
+    "dist/",
+    "!dist/demo"
+  ],
   "scripts": {
-    "dev": "./scripts/dev.sh",
-    "build": "./scripts/build.sh",
-    "clean": "rm -rf build dist",
-    "clean-all": "rm -rf .cache build dist node_modules package-lock.json"
+    "dev": "vite --config vite.demo.config.js",
+    "build": "yarn build:lib && yarn build:demo",
+    "build:lib": "vite build && vite build --config vite.workers.config.js",
+    "build:demo": "vite build --config vite.demo.config.js",
+    "clean": "rm -rf dist .vite",
+    "clean-all": "rm -rf dist .vite node_modules yarn.lock"
   },
   "devDependencies": {
-    "@babel/core": "^7.0.0-0",
-    "@babel/plugin-proposal-class-properties": "^7.7.4",
-    "@babel/plugin-transform-runtime": "^7.7.6",
-    "babel-eslint": "^10.0.3",
-    "cssnano": "^4.1.10",
     "eslint": "^7.1.0",
-    "opus-stream-decoder": "^1.2.6",
-    "parcel-bundler": "^1.12.4"
+    "vite": "^5.0.0",
+    "vite-plugin-static-copy": "^1.0.0"
   },
   "dependencies": {
-    "@babel/runtime": "^7.7.7",
-    "lit-html": "^1.1.2"
-  }
+    "lit-html": "^1.1.2",
+    "opus-stream-decoder": "^1.2.6"
+  },
+  "packageManager": "yarn@1.22.22+sha1.ac34549e6aa8e7ead463a7407e1c7390f61a6610"
 }
