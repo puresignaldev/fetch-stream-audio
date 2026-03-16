@@ -30,12 +30,12 @@ Opus playback can be tested at throttled download speeds and various bitrates:
 
 | Config             | Link                                                                                                       |
 |--------------------|------------------------------------------------------------------------------------------------------------|
-| 96 kbps / no limit | [#opusBitrate=96;throttle=nolimit](https://fetch-stream-audio.anthum.com/#opusBitrate=96;throttle=nolimit) |
-| 96 kbps / 1 mbps   | [#opusBitrate=96;throttle=1mbps](https://fetch-stream-audio.anthum.com/#opusBitrate=96;throttle=1mbps)     |
-| 96 kbps / 104 kbps | [#opusBitrate=96;throttle=104kbps](https://fetch-stream-audio.anthum.com/#opusBitrate=96;throttle=104kbps) |
-| 64 kbps / 72 kbps  | [#opusBitrate=64;throttle=72kbps](https://fetch-stream-audio.anthum.com/#opusBitrate=64;throttle=72kbps)   |
-| 32 kbps / 40 kbps  | [#opusBitrate=32;throttle=40kbps](https://fetch-stream-audio.anthum.com/#opusBitrate=32;throttle=40kbps)   |
-| 12 kbps / 16 kbps  | [#opusBitrate=12;throttle=16kbps](https://fetch-stream-audio.anthum.com/#opusBitrate=12;throttle=16kbps)   |
+| 96 kbps / no limit | [#opusBitrate=96;throttle=nolimit](https://puresignaldev.github.io/fetch-stream-audio/#opusBitrate=96;throttle=nolimit) |
+| 96 kbps / 1 mbps   | [#opusBitrate=96;throttle=1mbps](https://puresignaldev.github.io/fetch-stream-audio/#opusBitrate=96;throttle=1mbps)     |
+| 96 kbps / 104 kbps | [#opusBitrate=96;throttle=104kbps](https://puresignaldev.github.io/fetch-stream-audio/#opusBitrate=96;throttle=104kbps) |
+| 64 kbps / 72 kbps  | [#opusBitrate=64;throttle=72kbps](https://puresignaldev.github.io/fetch-stream-audio/#opusBitrate=64;throttle=72kbps)   |
+| 32 kbps / 40 kbps  | [#opusBitrate=32;throttle=40kbps](https://puresignaldev.github.io/fetch-stream-audio/#opusBitrate=32;throttle=40kbps)   |
+| 12 kbps / 16 kbps  | [#opusBitrate=12;throttle=16kbps](https://puresignaldev.github.io/fetch-stream-audio/#opusBitrate=12;throttle=16kbps)   |
 
 ## Nginx backend
 
