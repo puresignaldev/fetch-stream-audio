@@ -1,11 +1,11 @@
-export interface FetchStreamAudioOptions {
+export interface AudioStreamPlayerOptions {
   /** Override URL for WAV decoder worker */
   wavWorkerUrl?: string;
   /** Override URL for Opus decoder worker */
   opusWorkerUrl?: string;
 }
 
-export interface FetchStreamAudioState {
+export interface AudioStreamPlayerState {
   playState?: "playing" | "paused";
   error?: string;
   abCreated?: number;
@@ -22,11 +22,11 @@ export interface FetchStreamAudioState {
 
 export type DecoderName = "PCM" | "OPUS";
 
-export class FetchStreamAudio {
+export class AudioStreamPlayer {
   /**
    * Callback invoked when internal state changes (playback progress, errors, etc.)
    */
-  onUpdateState?: (state: FetchStreamAudioState) => void;
+  onUpdateState?: (state: AudioStreamPlayerState) => void;
 
   /**
    * @param url - URL of the audio file to stream
@@ -38,7 +38,7 @@ export class FetchStreamAudio {
     url: string,
     readBufferSize: number,
     decoderName: DecoderName,
-    options?: FetchStreamAudioOptions
+    options?: AudioStreamPlayerOptions
   );
 
   /** Start streaming and playback */

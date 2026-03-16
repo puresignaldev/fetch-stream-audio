@@ -8,7 +8,7 @@ function ignoreLibraryWorkerUrls() {
     name: 'ignore-library-worker-urls',
     enforce: 'pre',
     transform(code, id) {
-      if (id.includes('fetch-stream-audio') && id.endsWith('.mjs')) {
+      if (id.includes('fetch-stream-audio') && (id.endsWith('.mjs') || id.endsWith('.cjs'))) {
         return code.replaceAll('new URL("data:', 'new URL(/* @vite-ignore */ "data:');
       }
     }

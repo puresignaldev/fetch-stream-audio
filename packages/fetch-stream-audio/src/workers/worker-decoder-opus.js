@@ -1,5 +1,5 @@
 import OpusStreamDecoderFactory from 'opus-stream-decoder/dist/opus-stream-decoder.mjs';
-import { DecodedAudioPlaybackBuffer } from './modules/decoded-audio-playback-buffer.mjs';
+import { DecodedAudioPlaybackBuffer } from '../modules/decoded-audio-playback-buffer.mjs';
 
 const Module = OpusStreamDecoderFactory();
 const { OpusStreamDecoder } = Module;

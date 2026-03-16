@@ -29,8 +29,8 @@ export default defineConfig({
   build: {
     rollupOptions: {
       input: {
-        'worker-decoder-wav': 'src/js/worker-decoder-wav.js',
-        'worker-decoder-opus': 'src/js/worker-decoder-opus.js',
+        'worker-decoder-wav': 'src/workers/worker-decoder-wav.js',
+        'worker-decoder-opus': 'src/workers/worker-decoder-opus.js',
       },
       output: {
         entryFileNames: '[name].js',

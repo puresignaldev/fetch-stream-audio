@@ -21,10 +21,10 @@ export class AudioStreamPlayer {
     const { wavWorkerUrl, opusWorkerUrl } = options;
     switch (decoderName) {
       case 'PCM':
-        this._worker = new Worker(wavWorkerUrl || new URL('../worker-decoder-wav.js', import.meta.url), { type: 'module' });
+        this._worker = new Worker(wavWorkerUrl || new URL('../workers/worker-decoder-wav.js', import.meta.url), { type: 'module' });
         break;
       case 'OPUS':
-        this._worker = new Worker(opusWorkerUrl || new URL('../worker-decoder-opus.js', import.meta.url), { type: 'module' });
+        this._worker = new Worker(opusWorkerUrl || new URL('../workers/worker-decoder-opus.js', import.meta.url), { type: 'module' });
         break;
       default: throw Error('Unsupported decoderName: ' + decoderName);
     }

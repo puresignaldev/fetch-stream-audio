@@ -5,17 +5,17 @@ export default defineConfig({
   plugins: [
     viteStaticCopy({
       targets: [{
-        src: 'src/lib/index.d.ts',
+        src: 'src/index.d.ts',
         dest: '.'
       }]
     })
   ],
   build: {
     lib: {
-      entry: 'src/lib/index.mjs',
-      name: 'FetchStreamAudio',
+      entry: 'src/index.mjs',
+      name: 'AudioStreamPlayer',
       formats: ['es', 'cjs'],
-      fileName: (format) => `fetch-stream-audio.${format === 'es' ? 'mjs' : 'cjs'}`
+      fileName: (format) => `index.${format === 'es' ? 'mjs' : 'cjs'}`
     },
     copyPublicDir: false,
     minify: false,

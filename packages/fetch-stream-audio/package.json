@@ -3,21 +3,22 @@
   "version": "0.1.0",
   "description": "Low-latency streaming audio playback using Fetch, Streams, and Web Audio APIs",
   "type": "module",
-  "main": "./dist/fetch-stream-audio.cjs",
-  "module": "./dist/fetch-stream-audio.mjs",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
   "repository": "https://github.com/puresignaldev/fetch-stream-audio",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/fetch-stream-audio.mjs",
-      "require": "./dist/fetch-stream-audio.cjs"
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs"
     },
     "./worker-decoder-opus": "./dist/worker-decoder-opus.js",
     "./worker-decoder-wav": "./dist/worker-decoder-wav.js"
   },
   "files": [
-    "dist/"
+    "dist/",
+    "README.md"
   ],
   "scripts": {
     "build": "vite build && vite build --config vite.workers.config.js",
