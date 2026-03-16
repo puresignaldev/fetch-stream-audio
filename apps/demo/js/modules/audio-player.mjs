@@ -1,4 +1,6 @@
-import { AudioStreamPlayer } from './audio-stream-player.mjs';
+import { FetchStreamAudio } from '@puresignal/fetch-stream-audio';
+import wavWorkerUrl from '@puresignal/fetch-stream-audio/worker-decoder-wav?url';
+import opusWorkerUrl from '@puresignal/fetch-stream-audio/worker-decoder-opus?url';
 import { Player } from '../lit-components/player.mjs';
 
 export class AudioPlayer {
@@ -13,7 +15,7 @@ export class AudioPlayer {
     this._readSize = readBufferSize;
     this._ui = new Player(wrapper);
     this._ui.onAction = this._onAction.bind(this);
-    this._audio = new AudioStreamPlayer(url, readBufferSize, codec.toUpperCase());
+    this._audio = new FetchStreamAudio(url, readBufferSize, codec.toUpperCase(), { wavWorkerUrl, opusWorkerUrl });
     this._audio.onUpdateState = this._onUpdateState.bind(this);
 
     this._mime = mime;

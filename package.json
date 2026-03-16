@@ -1,41 +1,16 @@
 {
-  "name": "@puresignal/fetch-stream-audio",
-  "version": "0.1.0",
-  "description": "Low-latency streaming audio playback using Fetch, Streams, and Web Audio APIs",
-  "type": "module",
-  "main": "./dist/fetch-stream-audio.cjs",
-  "module": "./dist/fetch-stream-audio.mjs",
-  "types": "./dist/index.d.ts",
-  "repository": "https://github.com/puresignaldev/fetch-stream-audio",
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/fetch-stream-audio.mjs",
-      "require": "./dist/fetch-stream-audio.cjs"
-    },
-    "./worker-decoder-opus": "./dist/worker-decoder-opus.js",
-    "./worker-decoder-wav": "./dist/worker-decoder-wav.js"
-  },
-  "files": [
-    "dist/",
-    "!dist/demo"
-  ],
+  "private": true,
+  "workspaces": ["packages/*", "apps/*"],
   "scripts": {
-    "dev": "vite --config vite.demo.config.js",
+    "dev": "yarn build:lib && yarn workspace @puresignal/fetch-stream-audio-demo dev",
     "build": "yarn build:lib && yarn build:demo",
-    "build:lib": "vite build && vite build --config vite.workers.config.js",
-    "build:demo": "vite build --config vite.demo.config.js",
-    "clean": "rm -rf dist .vite",
-    "clean-all": "rm -rf dist .vite node_modules yarn.lock"
+    "build:lib": "yarn workspace @puresignal/fetch-stream-audio build",
+    "build:demo": "yarn workspace @puresignal/fetch-stream-audio-demo build",
+    "clean": "yarn workspaces run clean"
   },
   "devDependencies": {
-    "eslint": "10.0.3",
     "vite": "^5.0.0",
-    "vite-plugin-static-copy": "3.3.0"
-  },
-  "dependencies": {
-    "lit-html": "^1.1.2",
-    "opus-stream-decoder": "^1.2.6"
+    "eslint": "10.0.3"
   },
   "packageManager": "yarn@1.22.22+sha1.ac34549e6aa8e7ead463a7407e1c7390f61a6610"
 }

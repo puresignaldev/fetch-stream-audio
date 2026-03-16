@@ -1,12 +1,14 @@
 import { defineConfig } from 'vite';
 import { readFileSync } from 'fs';
-import { resolve } from 'path';
+import { createRequire } from 'module';
+
+const require = createRequire(import.meta.url);
 
 function inlineOpusWasm() {
   return {
     name: 'inline-opus-wasm',
     generateBundle(_, bundle) {
-      const wasmPath = resolve('node_modules/opus-stream-decoder/dist/opus-stream-decoder.wasm');
+      const wasmPath = require.resolve('opus-stream-decoder/dist/opus-stream-decoder.wasm');
       const wasmBase64 = readFileSync(wasmPath).toString('base64');
       const dataUri = `data:application/octet-stream;base64,${wasmBase64}`;
 
