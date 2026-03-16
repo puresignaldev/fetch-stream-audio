@@ -18,5 +18,6 @@ export default defineConfig({
       fileName: (format) => `fetch-stream-audio.${format === 'es' ? 'mjs' : 'cjs'}`
     },
     copyPublicDir: false,
+    minify: false,
   }
 });

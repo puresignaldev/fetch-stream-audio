@@ -5,15 +5,18 @@
   "type": "module",
   "main": "./dist/fetch-stream-audio.cjs",
   "module": "./dist/fetch-stream-audio.mjs",
+  "types": "./src/lib/index.d.ts",
   "exports": {
     ".": {
+      "types": "./src/lib/index.d.ts",
       "import": "./dist/fetch-stream-audio.mjs",
       "require": "./dist/fetch-stream-audio.cjs"
     }
   },
   "files": [
     "dist/",
-    "!dist/demo"
+    "!dist/demo",
+    "src/lib/index.d.ts"
   ],
   "scripts": {
     "dev": "vite --config vite.demo.config.js",
