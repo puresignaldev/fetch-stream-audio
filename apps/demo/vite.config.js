@@ -16,7 +16,6 @@ function ignoreLibraryWorkerUrls() {
 }
 
 export default defineConfig({
-  base: '/fetch-stream-audio/',
   plugins: [ignoreLibraryWorkerUrls()],
   build: {
     outDir: 'dist',

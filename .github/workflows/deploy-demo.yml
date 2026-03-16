@@ -32,6 +32,8 @@ jobs:
 
       - run: yarn build
 
+      - run: echo "fetch-stream-audio.puresignal.dev" > apps/demo/dist/CNAME
+
       - uses: actions/configure-pages@v5
 
       - uses: actions/upload-pages-artifact@v3
