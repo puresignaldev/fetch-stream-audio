@@ -136,7 +136,7 @@ player.onUpdateState = (partial) => {
 
 ## Demo
 
-A [live demo](https://fetch-stream-audio.puresignal.dev/) with [throttled bandwidth testing](../../apps/demo) is available in the [main repository](https://github.com/puresignaldev/fetch-stream-audio).
+A [live demo](https://fetch-stream-audio.puresignal.dev/) with throttled bandwidth testing is available in the [main repository](https://github.com/puresignaldev/fetch-stream-audio).
 
 ## License
 
